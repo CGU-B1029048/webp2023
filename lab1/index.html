@@ -6,42 +6,29 @@
     <body>
         <div id="container" tabindex="0" class="blockquote text-nowrap"></div>
         <script>
+            function random_char() {
+                    let rand_car = Math.floor(Math.random() * 26);
+                    return String.fromCharCode(97 + rand_car)
+                }
+        </script>
+        <script>
             var container = document.getElementById("container")
             window.onload = function() {
-                function random_char() {
-                    let rand_car = Math.floor(Math.random() * 26);
-                    return String.fromCharCode(97+ rand_car)
-                }
-                for (let i = 0; i < 3; i++)
+                for (let i = 0; i < Math.random()*3; i++)
                     container.textContent += random_char()
             }
         </script>
         <script>
             var container = document.getElementById("container")
-            function random_char() {
-                let rand_car = Math.floor(Math.random() * 26);
-                return String.fromCharCode(97+ rand_car)
-            }
             window.addEventListener("keyup", function(e) {
                 console.log(e.key)
                 if (e.key == container.textContent[0]) {
                     var str = container.textContent
                     container.textContent = str.substring(1, str.length)
-                } else if (e.key == "Escape") {
-                    container.textContent = ""
-                } else if (e.key == "Backspace") {
-                    var str = container.textContent
-                    container.textContent = str.substring(0, str.length-1)
-                } else {
-                    container.textContent += e.key
                 }
-                for (let i = 0; i < 3; i++)
+                for (let i = 0; i < Math.random()*3; i++)
                     container.textContent += random_char()
             })
         </script>
     </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> cd8bd904c2aa44b33f45c4a11bc6efcb7ee87755
