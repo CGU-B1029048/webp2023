@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"></style>
+    <meta charset="UTF-8">    
+    <script>
+        // Fetch API
+        var openurl = "https://quality.data.gov.tw/dq_download_json.php?nid=5948&md5_url=b7ce2082883f6b680810828799d4c32e";
+        var curPage = 1;
+        fetch(openurl)
+        .then(res => {
+            return res.json();
+        })
+        .then(result => {
+            dataset = result;
+            showDataset(dataset.slice((curPage-1)*10,curPage*10));
+            pagebutton(dataset, curPage);
+        })
+        .catch(error => {
+            console.log('Something went wrong:\n', error);
+        });
+
+        //show page number
+        function showPage(curData, ccurPage) {
+            var page = document.getElementById("page_page");
+            var btnNmu = Math.ceil(curData.length/10);
+            page.innerHTML = ccurPage+' / '+btnNmu + ' 頁';
+        }
+
+        function addNewData(dataset) {
+            var myTable = document.getElementById("csie");
+            dataset.forEach(function(data, index) {
+                var row = myTable.insertRow(-1);
+                row.insertCell(0).innerHTML = data['title'];
+                row.insertCell(1).innerHTML = data['showInfo'][0]['location'];
+                row.insertCell(2).innerHTML = data['showInfo'][0]['price'];
+            });
+        }
+        //show dataset 10 data per page
+        function showDataset(dataset) {
+            var myTable = document.getElementById("csie");
+            for(var i = myTable.rows.length - 1; i > 0; i--)
+                myTable.deleteRow(i);
+            dataset.forEach(function(data, index) {
+                var row = myTable.insertRow(-1);
+                row.insertCell(0).innerHTML = data['title'];
+                row.insertCell(1).innerHTML = data['showInfo'][0]['location'];
+                row.insertCell(2).innerHTML = data['showInfo'][0]['price'];
+            });
+        }
+
+        function createUpButton(data,currPage) {
+            var page = document.getElementById("upDiv");
+            var btnNmu = Math.ceil(data.length/10);
+            var btn = document.createElement("button");
+            btn.setAttribute("id", "buttonpageup");
+            btn.setAttribute("class", "btn btn-sm btn-success");
+            btn.innerHTML = "上一頁";
+            btn.onclick = function(){
+                if(currPage > 1){
+                    currPage--;
+                    showPage(data, currPage);
+                    showDataset(data.slice((currPage-1)*10,currPage*10));
+                    removeBtn();
+                    pagebutton(data, currPage);
+                }
+            }
+            page.appendChild(btn);
+        }
+        function createDownButton(data,currPage) {
+            var page = document.getElementById("downDiv");
+            var btnNmu = Math.ceil(data.length/10);
+            var btn = document.createElement("button");
+            btn.setAttribute("id","buttonpagedown");
+            btn.setAttribute("class", "btn btn-sm btn-success");
+            btn.innerHTML = "下一頁";
+            btn.onclick = function(){
+                if(currPage < btnNmu){
+                    currPage++;
+                    showPage(data, currPage);
+                    showDataset(data.slice((currPage-1)*10,currPage*10));
+                    removeBtn();
+                    pagebutton(data, currPage);
+                }
+            }
+            page.appendChild(btn);
+        }
+        //page button
+        function pagebutton(data, curPage){
+            showPage(data, curPage);
+            //pageUp button
+            createUpButton(data,curPage); 
+            //pageDown button
+            createDownButton(data,curPage);
+        };
+
+        //searchTitle function
+        function removeBtn() {
+            let btnSearchPage = document.getElementById("buttonpageup");
+            btnSearchPage.remove();
+            let btnSearchPageDown = document.getElementById("buttonpagedown");
+            btnSearchPageDown.remove();
+        }
+
+        function searchTitle(){
+            var searchTitlePage = 1;
+            searchTitlePage = 1;
+            curPage = 1;
+            console.log(searchTitlePage);
+            var searchTitle = document.getElementById("searchTitle").value;
+            //claer page button
+            removeBtn();
+
+            //check searchTitle is empty
+            if(searchTitle=='') {
+                var page = document.getElementById("page_btn");
+                showPage(dataset, curPage);
+                showDataset(dataset.slice((curPage-1)*10,curPage*10));
+                pagebutton(dataset, curPage);
+                return;
+            }
+
+            var searchResult = [];
+            dataset.forEach(function(data, index) {
+                if(data['title'].indexOf(searchTitle) != -1){
+                    searchResult.push(data);
+                }
+            });
+
+            showPage(dataset, searchTitlePage);
+            pagebutton(searchResult, searchTitlePage);
+            showDataset(searchResult.slice((curPage-1)*10,curPage*10));
+        }
+    </script>
+</head>
+
+<body>
+    <div class="grid-container">
+    <h1>景點觀光展覽資訊</h1>
+    <input type="text" id="searchTitle" onchange="searchTitle()"/>
+    </div>
+        <table id="csie" class="table table-success table-hover table-striped">
+            <tr class="table table-dark">
+                <th>景點名稱</th>
+                <th>景點地址</th>
+                <th>景點票價</th>
+            </tr>
+        </table>
+    <span class="p">
+        <span id="upDiv" class="left"></span>
+        <span id="page_page" class="middle"></span>
+        <span id="downDiv" class="right"></span> 
+    </span>
+ </body>
+</html>
